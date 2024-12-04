@@ -69,6 +69,8 @@ jobs:
   # Build for Windows
   release-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write # To create a GitHub release
 
     steps:
       - uses: olegtarasov/get-tag@v2.1.2
@@ -114,6 +116,8 @@ jobs:
   # Build for MacOS x86_64
   release-macOS-intel:
     runs-on: macOS-latest
+    permissions:
+      contents: write # To create a GitHub release
 
     steps:
       - uses: olegtarasov/get-tag@v2.1.2
@@ -160,6 +164,8 @@ jobs:
   # Build for MacOS Apple Silicon
   release-macOS-apple-silicon:
     runs-on: macOS-latest
+    permissions:
+      contents: write # To create a GitHub release
 
     steps:
       - uses: olegtarasov/get-tag@v2.1.2
