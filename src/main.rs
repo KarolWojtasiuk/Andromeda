@@ -1,3 +1,7 @@
+#![allow(clippy::type_complexity)]
+
+use engine::camera::{GameCamera, GameCameraTarget};
+use engine::player::Player;
 use engine::prelude::*;
 use engine::{GameInfo, create_app};
 
@@ -14,5 +18,21 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2d);
+    commands.spawn(GameCamera);
+    commands.spawn((Player, GameCameraTarget, Sprite {
+        color: Color::linear_rgb(1.0, 0.75, 0.0),
+        custom_size: Some(Vec2::new(50.0, 50.0)),
+        ..default()
+    }));
+
+    commands.spawn((Transform::from_xyz(-100.0, 0.0, 0.0), Sprite {
+        color: Color::linear_rgb(1.0, 0.0, 0.0),
+        custom_size: Some(Vec2::new(25.0, 25.0)),
+        ..default()
+    }));
+    commands.spawn((Transform::from_xyz(50.0, 250.0, 0.0), Sprite {
+        color: Color::linear_rgb(1.0, 0.0, 0.0),
+        custom_size: Some(Vec2::new(25.0, 25.0)),
+        ..default()
+    }));
 }

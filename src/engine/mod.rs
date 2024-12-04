@@ -2,7 +2,14 @@ pub mod prelude {
     pub use bevy::prelude::*;
 }
 
+pub mod camera;
+pub mod input;
+pub mod player;
+
+use camera::GameCameraPlugin;
 use clap::{ArgAction, Parser};
+use input::GameInputPlugin;
+use player::PlayerPlugin;
 use prelude::*;
 
 pub fn create_app(info: GameInfo) -> App {
@@ -10,13 +17,15 @@ pub fn create_app(info: GameInfo) -> App {
 
     let mut app = App::new();
     app.insert_resource(info);
-    app.add_plugins((DefaultPlugins.set(bevy::window::WindowPlugin {
+    app.add_plugins(DefaultPlugins.set(bevy::window::WindowPlugin {
         primary_window: Some(Window {
             title: info.name.to_string(),
             ..default()
         }),
         ..default()
-    }),));
+    }));
+
+    app.add_plugins((GameInputPlugin, GameCameraPlugin, PlayerPlugin));
 
     if args.show_game_info_overlay {
         app.add_systems(Startup, spawn_info_overlay);
