@@ -1,5 +1,6 @@
+use bevy::prelude::*;
+
 use super::input::GameplayInput;
-use crate::engine::prelude::*;
 
 pub struct PlayerPlugin;
 
@@ -9,8 +10,8 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-#[derive(Component, Default, Debug)]
-#[require(Transform)]
+#[derive(Component, Default, Reflect, Debug)]
+#[require(Transform, Name(|| Name::new("Player")))]
 pub struct Player;
 
 fn move_player(
@@ -22,7 +23,7 @@ fn move_player(
         return;
     }
 
-    let direction = Vec3::new(input.movement.x, input.movement.y, 0.0);
-    let speed = if input.sprint { 500.0 } else { 300.0 };
+    let direction = Vec3::new(input.movement.x, 0.0, -input.movement.y);
+    let speed = if input.sprint { 10.0 } else { 5.0 };
     player.translation += direction * speed * time.delta_secs();
 }

@@ -1,8 +1,8 @@
 #![allow(clippy::type_complexity)]
 
+use bevy::prelude::*;
 use engine::camera::{GameCamera, GameCameraTarget};
 use engine::player::Player;
-use engine::prelude::*;
 use engine::{GameInfo, create_app};
 
 mod engine;
@@ -17,22 +17,48 @@ fn main() {
     app.run();
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn(GameCamera);
-    commands.spawn((Player, GameCameraTarget, Sprite {
-        color: Color::linear_rgb(1.0, 0.75, 0.0),
-        custom_size: Some(Vec2::new(50.0, 50.0)),
-        ..default()
-    }));
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    commands.spawn(GameCamera::default());
+    commands.spawn((
+        DirectionalLight {
+            illuminance: light_consts::lux::OVERCAST_DAY * 2.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        Transform::from_xyz(3.0, 10.0, 3.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+    commands.spawn((
+        Transform::from_xyz(0.0, -1.0, 0.0),
+        Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(100.0, 100.0)))),
+        MeshMaterial3d(materials.add(Color::linear_rgb(0.1, 0.3, 0.1))),
+    ));
 
-    commands.spawn((Transform::from_xyz(-100.0, 0.0, 0.0), Sprite {
-        color: Color::linear_rgb(1.0, 0.0, 0.0),
-        custom_size: Some(Vec2::new(25.0, 25.0)),
-        ..default()
-    }));
-    commands.spawn((Transform::from_xyz(50.0, 250.0, 0.0), Sprite {
-        color: Color::linear_rgb(1.0, 0.0, 0.0),
-        custom_size: Some(Vec2::new(25.0, 25.0)),
-        ..default()
-    }));
+    let capsule = meshes.add(Capsule3d::new(0.5, 1.0));
+    commands.spawn((
+        Player,
+        GameCameraTarget,
+        Mesh3d(capsule.clone()),
+        MeshMaterial3d(materials.add(Color::linear_rgb(1.0, 0.8, 0.0))),
+    ));
+
+    let red = materials.add(Color::linear_rgb(1.0, 0.0, 0.0));
+    commands.spawn((
+        Transform::from_xyz(-3.0, 0.0, 0.0),
+        Mesh3d(capsule.clone()),
+        MeshMaterial3d(red.clone()),
+    ));
+    commands.spawn((
+        Transform::from_xyz(5.0, 0.0, -2.5),
+        Mesh3d(capsule.clone()),
+        MeshMaterial3d(red.clone()),
+    ));
+    commands.spawn((
+        Transform::from_xyz(0.0, 0.0, 5.0),
+        Mesh3d(capsule.clone()),
+        MeshMaterial3d(red.clone()),
+    ));
 }
