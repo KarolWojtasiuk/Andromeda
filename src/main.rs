@@ -25,7 +25,7 @@ fn setup(
     commands.spawn(GameCamera::default());
     commands.spawn((
         DirectionalLight {
-            illuminance: light_consts::lux::OVERCAST_DAY,
+            illuminance: light_consts::lux::OVERCAST_DAY * 2.0,
             shadows_enabled: true,
             ..default()
         },
@@ -34,7 +34,7 @@ fn setup(
     commands.spawn((
         Transform::from_xyz(0.0, -1.0, 0.0),
         Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(100.0, 100.0)))),
-        MeshMaterial3d(materials.add(Color::linear_rgb(0.1, 0.15, 0.1))),
+        MeshMaterial3d(materials.add(Color::linear_rgb(0.1, 0.3, 0.1))),
     ));
 
     let capsule = meshes.add(Capsule3d::new(0.5, 1.0));

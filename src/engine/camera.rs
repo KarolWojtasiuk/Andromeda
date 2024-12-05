@@ -18,11 +18,11 @@ impl Plugin for GameCameraPlugin {
 pub struct GameCamera {
     #[default(Dir3::from_xyz(0.0, 2.5, 1.0).unwrap())]
     pub direction: Dir3,
-    #[default(15.0)]
+    #[default(20.0)]
     pub distance: f32,
-    #[default(3.0)]
+    #[default(5.0)]
     pub min_distance: f32,
-    #[default(30.0)]
+    #[default(50.0)]
     pub max_distance: f32,
     #[default(5.0)]
     pub smooth_rate: f32,
