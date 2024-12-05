@@ -1,16 +1,15 @@
-pub mod prelude {
-    pub use bevy::prelude::*;
-}
-
 pub mod camera;
 pub mod input;
 pub mod player;
 
+use bevy::prelude::*;
+use bevy_inspector_egui::DefaultInspectorConfigPlugin;
+use bevy_inspector_egui::bevy_egui::EguiPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::GameCameraPlugin;
 use clap::{ArgAction, Parser};
 use input::GameInputPlugin;
 use player::PlayerPlugin;
-use prelude::*;
 
 pub fn create_app(info: GameInfo) -> App {
     let args = EngineArgs::parse();
@@ -27,8 +26,16 @@ pub fn create_app(info: GameInfo) -> App {
 
     app.add_plugins((GameInputPlugin, GameCameraPlugin, PlayerPlugin));
 
-    if args.show_game_info_overlay {
+    if args.show_game_version_overlay {
         app.add_systems(Startup, spawn_info_overlay);
+    }
+
+    if args.enable_inspector {
+        app.add_plugins((
+            EguiPlugin,
+            DefaultInspectorConfigPlugin,
+            WorldInspectorPlugin::default(),
+        ));
     }
 
     app
@@ -38,13 +45,20 @@ pub fn create_app(info: GameInfo) -> App {
 #[command(version)]
 struct EngineArgs {
     #[arg(
-        short = 'i',
-        long = "info-overlay",
-        help = "Show game info overlay",
+        short = 'v',
+        long = "version-overlay",
+        help = "Show game version overlay",
         action = ArgAction::Set,
         default_value_t = true,
     )]
-    pub show_game_info_overlay: bool,
+    pub show_game_version_overlay: bool,
+    #[arg(
+        short = 'i',
+        long = "inspector",
+        help = "Enable world inspector",
+        default_value_t = false
+    )]
+    pub enable_inspector: bool,
 }
 
 #[derive(Resource, Clone, Copy)]

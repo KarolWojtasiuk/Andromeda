@@ -1,17 +1,18 @@
 use bevy::input::mouse::AccumulatedMouseScroll;
-
-use crate::engine::prelude::*;
+use bevy::prelude::*;
 
 pub struct GameInputPlugin;
 
 impl Plugin for GameInputPlugin {
     fn build(&self, app: &mut App) {
+        app.register_type::<GameplayInput>();
         app.init_resource::<GameplayInput>();
         app.add_systems(Update, update_gameplay_input);
     }
 }
 
-#[derive(Resource, Default, Debug)]
+#[derive(Resource, Default, Reflect, Debug)]
+#[reflect(Resource)]
 pub struct GameplayInput {
     pub movement: Vec2,
     pub sprint: bool,
