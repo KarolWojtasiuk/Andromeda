@@ -1,15 +1,18 @@
 pub mod camera;
+pub mod character;
 pub mod input;
-pub mod player;
 
+use bevy::diagnostic::{
+    EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin,
+};
 use bevy::prelude::*;
 use bevy_inspector_egui::DefaultInspectorConfigPlugin;
 use bevy_inspector_egui::bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::GameCameraPlugin;
+use character::CharacterPlugin;
 use clap::{ArgAction, Parser};
 use input::GameInputPlugin;
-use player::PlayerPlugin;
 
 pub fn create_app(info: GameInfo) -> App {
     let args = EngineArgs::parse();
@@ -24,7 +27,7 @@ pub fn create_app(info: GameInfo) -> App {
         ..default()
     }));
 
-    app.add_plugins((GameInputPlugin, GameCameraPlugin, PlayerPlugin));
+    app.add_plugins((GameInputPlugin, GameCameraPlugin, CharacterPlugin));
 
     if args.show_game_version_overlay {
         app.add_systems(Startup, spawn_info_overlay);
@@ -35,6 +38,14 @@ pub fn create_app(info: GameInfo) -> App {
             EguiPlugin,
             DefaultInspectorConfigPlugin,
             WorldInspectorPlugin::default(),
+        ));
+    }
+
+    if args.enable_diagnostics {
+        app.add_plugins((
+            LogDiagnosticsPlugin::default(),
+            FrameTimeDiagnosticsPlugin,
+            EntityCountDiagnosticsPlugin,
         ));
     }
 
@@ -59,6 +70,13 @@ struct EngineArgs {
         default_value_t = false
     )]
     pub enable_inspector: bool,
+    #[arg(
+        short = 'd',
+        long = "diagnostics",
+        help = "Enable diagnostics logging",
+        default_value_t = false
+    )]
+    pub enable_diagnostics: bool,
 }
 
 #[derive(Resource, Clone, Copy)]

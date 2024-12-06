@@ -2,19 +2,22 @@
 
 use bevy::prelude::*;
 use engine::camera::{GameCamera, GameCameraTarget};
-use engine::player::Player;
+use engine::character::Speed;
+use engine::character::npc::Npc;
+use engine::character::player::Player;
 use engine::{GameInfo, create_app};
+use rand::Rng;
 
 mod engine;
 
-fn main() {
+fn main() -> AppExit {
     let mut app = create_app(GameInfo {
         name: env!("CARGO_PKG_NAME"),
         version: Some(env!("CARGO_PKG_VERSION")),
     });
 
     app.add_systems(Startup, setup);
-    app.run();
+    app.run()
 }
 
 fn setup(
@@ -46,19 +49,15 @@ fn setup(
     ));
 
     let red = materials.add(Color::linear_rgb(1.0, 0.0, 0.0));
-    commands.spawn((
-        Transform::from_xyz(-3.0, 0.0, 0.0),
-        Mesh3d(capsule.clone()),
-        MeshMaterial3d(red.clone()),
-    ));
-    commands.spawn((
-        Transform::from_xyz(5.0, 0.0, -2.5),
-        Mesh3d(capsule.clone()),
-        MeshMaterial3d(red.clone()),
-    ));
-    commands.spawn((
-        Transform::from_xyz(0.0, 0.0, 5.0),
-        Mesh3d(capsule.clone()),
-        MeshMaterial3d(red.clone()),
-    ));
+    for x in -10..10 {
+        for z in -10..10 {
+            commands.spawn((
+                Npc::default(),
+                Speed(rand::thread_rng().gen_range(3.0..10.0)),
+                Transform::from_xyz(x as f32 * 5.0, 0.0, 75.0 + z as f32 * 5.0),
+                Mesh3d(capsule.clone()),
+                MeshMaterial3d(red.clone()),
+            ));
+        }
+    }
 }

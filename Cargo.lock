@@ -183,6 +183,7 @@ dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "clap",
+ "rand",
  "smart-default",
 ]
 
