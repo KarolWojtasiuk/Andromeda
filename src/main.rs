@@ -5,6 +5,8 @@ use engine::camera::{GameCamera, GameCameraTarget};
 use engine::character::Speed;
 use engine::character::npc::Npc;
 use engine::character::player::Player;
+use engine::item::Item;
+use engine::item::storage::InsertItemCommand;
 use engine::{GameInfo, create_app};
 use rand::Rng;
 
@@ -36,17 +38,32 @@ fn setup(
     ));
     commands.spawn((
         Transform::from_xyz(0.0, -1.0, 0.0),
-        Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(100.0, 100.0)))),
+        Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(1000.0, 1000.0)))),
         MeshMaterial3d(materials.add(Color::linear_rgb(0.1, 0.3, 0.1))),
     ));
 
     let capsule = meshes.add(Capsule3d::new(0.5, 1.0));
-    commands.spawn((
-        Player,
-        GameCameraTarget,
-        Mesh3d(capsule.clone()),
-        MeshMaterial3d(materials.add(Color::linear_rgb(1.0, 0.8, 0.0))),
-    ));
+    let player = commands
+        .spawn((
+            Player,
+            GameCameraTarget,
+            Mesh3d(capsule.clone()),
+            MeshMaterial3d(materials.add(Color::linear_rgb(1.0, 0.8, 0.0))),
+        ))
+        .id();
+
+    let item = commands
+        .spawn((
+            Item,
+            Transform::default(),
+            Mesh3d(meshes.add(Cuboid::new(0.2, 0.2, 0.2))),
+            MeshMaterial3d(materials.add(Color::linear_rgb(1.0, 1.0, 1.0))),
+        ))
+        .id();
+    commands.queue(InsertItemCommand {
+        storage: player,
+        item,
+    });
 
     let red = materials.add(Color::linear_rgb(1.0, 0.0, 0.0));
     for x in -10..10 {

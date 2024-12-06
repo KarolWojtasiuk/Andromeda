@@ -1,6 +1,7 @@
 pub mod camera;
 pub mod character;
 pub mod input;
+pub mod item;
 
 use bevy::diagnostic::{
     EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin,
@@ -13,6 +14,7 @@ use camera::GameCameraPlugin;
 use character::CharacterPlugin;
 use clap::{ArgAction, Parser};
 use input::GameInputPlugin;
+use item::ItemPlugin;
 
 pub fn create_app(info: GameInfo) -> App {
     let args = EngineArgs::parse();
@@ -27,7 +29,12 @@ pub fn create_app(info: GameInfo) -> App {
         ..default()
     }));
 
-    app.add_plugins((GameInputPlugin, GameCameraPlugin, CharacterPlugin));
+    app.add_plugins((
+        GameInputPlugin,
+        GameCameraPlugin,
+        CharacterPlugin,
+        ItemPlugin,
+    ));
 
     if args.show_game_version_overlay {
         app.add_systems(Startup, spawn_info_overlay);

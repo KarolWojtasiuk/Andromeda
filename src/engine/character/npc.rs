@@ -26,13 +26,12 @@ pub enum Npc {
 fn move_npcs(mut npcs: Query<(&mut Transform, &mut Npc, &Speed)>, time: Res<Time>) {
     // temporary ai implementation: move to random places xd
 
+    let mut rng = rand::thread_rng();
     for (mut transform, mut npc, speed) in npcs.iter_mut() {
         match npc.as_mut() {
             Npc::Idle(timer) => {
                 timer.tick(time.delta());
                 if timer.finished() {
-                    let mut rng = rand::thread_rng();
-
                     let direction = Vec3::new(
                         rng.gen_range(-1.0..1.0),
                         transform.translation.y,
@@ -51,7 +50,7 @@ fn move_npcs(mut npcs: Query<(&mut Transform, &mut Npc, &Speed)>, time: Res<Time
 
                 if transform.translation.distance(*target) < 0.1 {
                     *npc = Npc::Idle(Timer::new(
-                        Duration::from_secs_f32(rand::thread_rng().gen_range(0.1..3.0)),
+                        Duration::from_secs_f32(rng.gen_range(0.1..3.0)),
                         TimerMode::Once,
                     ))
                 }
