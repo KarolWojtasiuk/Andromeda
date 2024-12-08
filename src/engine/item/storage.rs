@@ -11,6 +11,12 @@ impl Plugin for ItemStoragePlugin {
 #[derive(Component, Default, Reflect, Debug)]
 pub struct ItemStorage(pub(self) Vec<Entity>);
 
+impl ItemStorage {
+    pub fn items(&self) -> &[Entity] {
+        &self.0
+    }
+}
+
 pub struct InsertItemCommand {
     pub storage: Entity,
     pub item: Entity,

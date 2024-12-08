@@ -33,7 +33,7 @@ To differentiate these forms we need some assumption based on whether the entity
 
 #[cfg(debug_assertions)]
 fn validate_item_assumption(
-    items: Query<(Entity, &Name), (With<Item>, Without<Transform>, Without<Parent>)>,
+    items: Populated<(Entity, &Name), (With<Item>, Without<Transform>, Without<Parent>)>,
     mut commands: Commands,
 ) {
     for (entity, name) in items.iter() {

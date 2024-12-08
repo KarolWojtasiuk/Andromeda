@@ -23,7 +23,7 @@ pub enum Npc {
     Moving(Vec3),
 }
 
-fn move_npcs(mut npcs: Query<(&mut Transform, &mut Npc, &Speed)>, time: Res<Time>) {
+fn move_npcs(mut npcs: Populated<(&mut Transform, &mut Npc, &Speed)>, time: Res<Time>) {
     // temporary ai implementation: move to random places xd
 
     let mut rng = rand::thread_rng();
