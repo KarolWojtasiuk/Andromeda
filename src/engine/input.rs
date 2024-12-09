@@ -17,6 +17,7 @@ pub struct GameplayInput {
     pub movement: Vec2,
     pub sprint: bool,
     pub zoom: f32,
+    pub toggle_inventory: bool,
 }
 
 fn update_gameplay_input(
@@ -44,4 +45,5 @@ fn update_gameplay_input(
 
     input.sprint = keyboard.pressed(KeyCode::ShiftLeft);
     input.zoom = mouse_scroll.delta.y;
+    input.toggle_inventory = keyboard.just_pressed(KeyCode::Tab);
 }

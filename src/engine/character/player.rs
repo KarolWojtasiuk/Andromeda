@@ -2,13 +2,15 @@ use bevy::prelude::*;
 
 use super::{Character, Speed};
 use crate::engine::input::GameplayInput;
+use crate::engine::item::Item;
+use crate::engine::item::storage::InsertItemCommand;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<Player>();
-        app.add_systems(Update, move_player);
+        app.add_systems(Update, (move_player, pickup_items));
     }
 }
 
@@ -35,4 +37,26 @@ fn move_player(
         speed.clamp(0.0, 100.0)
     };
     player.0.translation += direction * speed * time.delta_secs();
+}
+
+fn pickup_items(
+    mut commands: Commands,
+    mut click_events: EventReader<Pointer<Down>>,
+    items: Query<&GlobalTransform, (With<Item>, With<Transform>)>,
+    player: Single<(Entity, &GlobalTransform), With<Player>>,
+) {
+    for click in click_events.read() {
+        if let Ok(item_transform) = items.get(click.target) {
+            if item_transform
+                .translation()
+                .distance(player.1.translation())
+                <= 5.0
+            {
+                commands.queue(InsertItemCommand {
+                    storage: player.0,
+                    item: click.target,
+                });
+            }
+        }
+    }
 }
