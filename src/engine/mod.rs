@@ -1,4 +1,4 @@
-mod debug_ui;
+mod ui;
 
 pub mod camera;
 pub mod character;
@@ -10,14 +10,13 @@ use bevy::diagnostic::{
 };
 use bevy::prelude::*;
 use bevy_inspector_egui::DefaultInspectorConfigPlugin;
-use bevy_inspector_egui::bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::GameCameraPlugin;
 use character::CharacterPlugin;
 use clap::{ArgAction, Parser};
-use debug_ui::DebugUiPlugin;
 use input::GameInputPlugin;
 use item::ItemPlugin;
+use ui::GameUiPlugin;
 
 pub fn create_app(info: GameInfo) -> App {
     let args = EngineArgs::parse();
@@ -37,6 +36,7 @@ pub fn create_app(info: GameInfo) -> App {
         GameCameraPlugin,
         CharacterPlugin,
         ItemPlugin,
+        GameUiPlugin,
     ));
 
     if args.show_game_version_overlay {
@@ -44,10 +44,6 @@ pub fn create_app(info: GameInfo) -> App {
     }
 
     if args.enable_inspector {
-        if !app.is_plugin_added::<EguiPlugin>() {
-            app.add_plugins(EguiPlugin);
-        }
-
         app.add_plugins((
             DefaultInspectorConfigPlugin,
             WorldInspectorPlugin::default(),
@@ -60,14 +56,6 @@ pub fn create_app(info: GameInfo) -> App {
             FrameTimeDiagnosticsPlugin,
             EntityCountDiagnosticsPlugin,
         ));
-    }
-
-    if args.enable_debug_ui {
-        if !app.is_plugin_added::<EguiPlugin>() {
-            app.add_plugins(EguiPlugin);
-        }
-
-        app.add_plugins(DebugUiPlugin);
     }
 
     app
@@ -98,13 +86,6 @@ struct EngineArgs {
         default_value_t = false
     )]
     pub enable_diagnostics: bool,
-    #[arg(
-        short = 'u',
-        long = "debug-ui",
-        help = "Enable debug UI",
-        default_value_t = false
-    )]
-    pub enable_debug_ui: bool,
 }
 
 #[derive(Resource, Clone, Copy)]

@@ -6,8 +6,8 @@ use engine::camera::{GameCamera, GameCameraTarget};
 use engine::character::Speed;
 use engine::character::npc::Npc;
 use engine::character::player::Player;
-use engine::item::Item;
 use engine::item::storage::InsertItemCommand;
+use engine::item::{Item, ItemDescription};
 use engine::{GameInfo, create_app};
 use rand::Rng;
 
@@ -53,17 +53,28 @@ fn setup(
         ))
         .id();
 
-    let item = commands
+    commands.spawn((
+        Item,
+        Name::new("Chestplate"),
+        ItemDescription("Heavy steel chestplate".to_string()),
+        Transform::default(),
+        Mesh3d(meshes.add(Cuboid::new(0.5, 0.1, 0.5))),
+        MeshMaterial3d(materials.add(Color::linear_rgb(0.5, 0.5, 1.0))),
+    ));
+
+    let sword = commands
         .spawn((
             Item,
+            Name::new("Sword"),
+            ItemDescription("Long steel sword".to_string()),
             Transform::default(),
-            Mesh3d(meshes.add(Cuboid::new(0.2, 0.2, 0.2))),
-            MeshMaterial3d(materials.add(Color::linear_rgb(1.0, 1.0, 1.0))),
+            Mesh3d(meshes.add(Cuboid::new(0.4, 0.1, 1.25))),
+            MeshMaterial3d(materials.add(Color::linear_rgb(0.3, 0.3, 0.3))),
         ))
         .id();
     commands.queue(InsertItemCommand {
         storage: player,
-        item,
+        item: sword,
     });
 
     let red = materials.add(Color::linear_rgb(1.0, 0.0, 0.0));
