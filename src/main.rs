@@ -1,4 +1,5 @@
 #![allow(clippy::type_complexity)]
+#![allow(clippy::too_many_arguments)]
 
 use bevy::prelude::*;
 use engine::camera::{GameCamera, GameCameraTarget};
