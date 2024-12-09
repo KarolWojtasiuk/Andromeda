@@ -6,6 +6,8 @@ use npc::NpcPlugin;
 use player::PlayerPlugin;
 use smart_default::SmartDefault;
 
+use super::item::storage::ItemStorage;
+
 pub struct CharacterPlugin;
 
 impl Plugin for CharacterPlugin {
@@ -18,7 +20,7 @@ impl Plugin for CharacterPlugin {
 }
 
 #[derive(Component, Default, Reflect, Debug)]
-#[require(Transform, Name(|| Name::new("Character")), Health, Speed)]
+#[require(Transform, Name(|| Name::new("Character")), Health, Speed, ItemStorage)]
 pub struct Character;
 
 #[derive(Component, SmartDefault, Reflect, Debug)]

@@ -1,6 +1,9 @@
+mod debug_ui;
+
 pub mod camera;
 pub mod character;
 pub mod input;
+pub mod item;
 
 use bevy::diagnostic::{
     EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin,
@@ -12,7 +15,9 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::GameCameraPlugin;
 use character::CharacterPlugin;
 use clap::{ArgAction, Parser};
+use debug_ui::DebugUiPlugin;
 use input::GameInputPlugin;
+use item::ItemPlugin;
 
 pub fn create_app(info: GameInfo) -> App {
     let args = EngineArgs::parse();
@@ -27,15 +32,23 @@ pub fn create_app(info: GameInfo) -> App {
         ..default()
     }));
 
-    app.add_plugins((GameInputPlugin, GameCameraPlugin, CharacterPlugin));
+    app.add_plugins((
+        GameInputPlugin,
+        GameCameraPlugin,
+        CharacterPlugin,
+        ItemPlugin,
+    ));
 
     if args.show_game_version_overlay {
         app.add_systems(Startup, spawn_info_overlay);
     }
 
     if args.enable_inspector {
+        if !app.is_plugin_added::<EguiPlugin>() {
+            app.add_plugins(EguiPlugin);
+        }
+
         app.add_plugins((
-            EguiPlugin,
             DefaultInspectorConfigPlugin,
             WorldInspectorPlugin::default(),
         ));
@@ -47,6 +60,14 @@ pub fn create_app(info: GameInfo) -> App {
             FrameTimeDiagnosticsPlugin,
             EntityCountDiagnosticsPlugin,
         ));
+    }
+
+    if args.enable_debug_ui {
+        if !app.is_plugin_added::<EguiPlugin>() {
+            app.add_plugins(EguiPlugin);
+        }
+
+        app.add_plugins(DebugUiPlugin);
     }
 
     app
@@ -71,12 +92,19 @@ struct EngineArgs {
     )]
     pub enable_inspector: bool,
     #[arg(
-        short = 'd',
-        long = "diagnostics",
+        short = 'l',
+        long = "diagnostics-logger",
         help = "Enable diagnostics logging",
         default_value_t = false
     )]
     pub enable_diagnostics: bool,
+    #[arg(
+        short = 'u',
+        long = "debug-ui",
+        help = "Enable debug UI",
+        default_value_t = false
+    )]
+    pub enable_debug_ui: bool,
 }
 
 #[derive(Resource, Clone, Copy)]
