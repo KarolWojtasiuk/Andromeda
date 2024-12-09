@@ -71,6 +71,16 @@ fn draw_ui(
                 });
             });
         };
+
+        grid_row(ui, "Actions", |ui| {
+            if ui.button("Unselect").clicked() {
+                selected_entity.0 = None;
+            }
+            if ui.button("Despawn").clicked() {
+                selected_entity.0 = None;
+                commands.queue(DespawnRecursive { warn: true, entity });
+            }
+        });
     });
 
     if let Ok((trasform, global_transform)) = spatials.get(entity) {
