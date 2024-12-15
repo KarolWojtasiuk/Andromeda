@@ -148,7 +148,7 @@ macro_rules! generate_registry_commands {
             mut command: ConsoleCommand<$spawn_command>,
             mut commands: Commands,
             registry: Res<PrototypeRegistry<T>>,
-            player: Single<&GlobalTransform, With<Player>>,
+            player: Query<&GlobalTransform, With<Player>>,
         ) {
             let Some(Ok($spawn_command { id, position })) = command.take() else {
                 return;
@@ -161,20 +161,27 @@ macro_rules! generate_registry_commands {
 
             let transform = Transform::from_translation(match position {
                 Position::Custom(vec) => vec,
-                Position::Player => player.translation(),
+                Position::Player => match player.iter().next() {
+                    Some(player) => player.translation(),
+                    None => {
+                        command
+                            .reply("Cannot spawn at player position because player does not exist");
+                        return;
+                    }
+                },
             });
 
-            registry.spawn_at(id, transform, &mut commands);
+            let entity = registry.spawn_at(id, transform, &mut commands);
             command.reply(format!(
-                "{} has been successfully spawned at {}",
-                id, transform.translation
+                "{} ({}) has been successfully spawned at {}",
+                id, entity, transform.translation
             ));
         }
 
         fn $despawn_system<T: PrototypeId>(
             mut command: ConsoleCommand<$despawn_command>,
             mut commands: Commands,
-            query: Populated<(Entity, &PrototypeInstance<T>)>,
+            query: Query<(Entity, &PrototypeInstance<T>)>,
         ) {
             let Some(Ok($despawn_command { id, all })) = command.take() else {
                 return;
@@ -188,7 +195,10 @@ macro_rules! generate_registry_commands {
             for (entity, prototype) in query.iter() {
                 if prototype.id() == id {
                     commands.entity(entity).despawn_recursive();
-                    command.reply(format!("{} has been successfully despawned", entity));
+                    command.reply(format!(
+                        "{} ({}) has been successfully despawned",
+                        id, entity
+                    ));
 
                     if !all {
                         return;
@@ -197,12 +207,6 @@ macro_rules! generate_registry_commands {
             }
         }
     };
-}
-
-#[derive(Parser, ConsoleCommand)]
-#[command(name = "despawn-entity", about = "Despawns entity from a world")]
-struct DespawnEntityCommand {
-    id: String,
 }
 
 generate_registry_commands!(
