@@ -9,12 +9,14 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
+        app.add_plugins(MeshPickingPlugin);
+
         app.register_type::<Player>();
         app.add_systems(Update, (move_player, pickup_items));
     }
 }
 
-#[derive(Component, Default, Reflect, Debug)]
+#[derive(Component, Default, Clone, Reflect, Debug)]
 #[require(Name(|| Name::new("Player")), Character)]
 pub struct Player;
 

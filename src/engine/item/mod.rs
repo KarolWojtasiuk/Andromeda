@@ -45,12 +45,12 @@ fn validate_item_assumption(
     }
 }
 
-#[derive(Component, Default, Reflect, Debug)]
+#[derive(Component, Clone, Default, Reflect, Debug)]
 #[require(Name(|| Name::new("Item")), ItemDescription, ItemValue)]
 pub struct Item;
 
-#[derive(Component, Default, Reflect, Debug)]
+#[derive(Component, Clone, Default, Reflect, Debug)]
 pub struct ItemDescription(pub String);
 
-#[derive(Component, Default, Reflect, Debug)]
+#[derive(Component, Clone, Default, Reflect, Debug)]
 pub struct ItemValue(pub u16);

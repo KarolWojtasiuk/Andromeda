@@ -15,7 +15,7 @@ impl Plugin for NpcPlugin {
     }
 }
 
-#[derive(Component, SmartDefault, Reflect, Debug)]
+#[derive(Component, SmartDefault, Clone, Reflect, Debug)]
 #[require(Name(|| Name::new("NPC")), Character)]
 pub enum Npc {
     #[default]
