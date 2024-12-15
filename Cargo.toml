@@ -6,7 +6,13 @@ edition = "2024"
 [dependencies]
 bevy = { version = "0.15", features = ["wayland"] }
 bevy-inspector-egui = "0.28.0"
+bevy_console = "0.13.0"
 clap = { version = "4.5", features = ["derive"] }
+derive_more = { version = "1.0.0", features = [
+    "constructor",
+    "from_str",
+    "display",
+] }
 rand = "0.8.5"
 smart-default = "0.7.1"
 

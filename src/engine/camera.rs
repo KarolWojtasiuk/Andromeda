@@ -28,7 +28,7 @@ pub struct GameCamera {
     pub smooth_rate: f32,
 }
 
-#[derive(Component, Default, Reflect, Debug)]
+#[derive(Component, Default, Clone, Reflect, Debug)]
 #[require(Transform)]
 pub struct GameCameraTarget;
 

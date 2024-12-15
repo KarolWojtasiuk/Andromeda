@@ -1,24 +1,31 @@
-mod ui;
-
 pub mod camera;
 pub mod character;
 pub mod input;
 pub mod item;
+pub mod prototype;
+
+mod debug_console;
 
 use bevy::diagnostic::{
     EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin,
 };
+use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
 use bevy_inspector_egui::DefaultInspectorConfigPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::GameCameraPlugin;
 use character::CharacterPlugin;
 use clap::{ArgAction, Parser};
+use debug_console::DebugConsolePlugin;
 use input::GameInputPlugin;
 use item::ItemPlugin;
-use ui::GameUiPlugin;
+use prototype::{PrototypeId, PrototypeRegistry};
 
-pub fn create_app(info: GameInfo) -> App {
+pub fn create_app<CharacterId: PrototypeId, ItemId: PrototypeId, CharacterMarker, ItemMarker>(
+    info: GameInfo,
+    create_character_registry: impl IntoSystem<(), PrototypeRegistry<CharacterId>, CharacterMarker>,
+    create_item_registry: impl IntoSystem<(), PrototypeRegistry<ItemId>, ItemMarker>,
+) -> App {
     let args = EngineArgs::parse();
 
     let mut app = App::new();
@@ -36,8 +43,19 @@ pub fn create_app(info: GameInfo) -> App {
         GameCameraPlugin,
         CharacterPlugin,
         ItemPlugin,
-        GameUiPlugin,
     ));
+
+    let character_registry = app
+        .world_mut()
+        .run_system_once(create_character_registry)
+        .expect("Cannot initialize character registry");
+    app.insert_resource(character_registry);
+
+    let item_registry = app
+        .world_mut()
+        .run_system_once(create_item_registry)
+        .expect("Cannot initialize item registry");
+    app.insert_resource(item_registry);
 
     if args.show_game_version_overlay {
         app.add_systems(Startup, spawn_info_overlay);
@@ -58,6 +76,10 @@ pub fn create_app(info: GameInfo) -> App {
         ));
     }
 
+    if args.enable_console {
+        app.add_plugins(DebugConsolePlugin::<CharacterId, ItemId>::default());
+    }
+
     app
 }
 
@@ -72,6 +94,7 @@ struct EngineArgs {
         default_value_t = true,
     )]
     pub show_game_version_overlay: bool,
+
     #[arg(
         short = 'i',
         long = "inspector",
@@ -79,6 +102,7 @@ struct EngineArgs {
         default_value_t = false
     )]
     pub enable_inspector: bool,
+
     #[arg(
         short = 'l',
         long = "diagnostics-logger",
@@ -86,6 +110,14 @@ struct EngineArgs {
         default_value_t = false
     )]
     pub enable_diagnostics: bool,
+
+    #[arg(
+        short = 'c',
+        long = "debug-console",
+        help = "Enable debug console",
+        default_value_t = false
+    )]
+    pub enable_console: bool,
 }
 
 #[derive(Resource, Clone, Copy)]

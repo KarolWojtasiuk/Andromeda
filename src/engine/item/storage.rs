@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::engine::item::Item;
+
 pub struct ItemStoragePlugin;
 
 impl Plugin for ItemStoragePlugin {
@@ -9,11 +11,20 @@ impl Plugin for ItemStoragePlugin {
 }
 
 #[derive(Component, Default, Reflect, Debug)]
-pub struct ItemStorage(pub(self) Vec<Entity>);
+pub struct ItemStorage;
 
-impl ItemStorage {
-    pub fn items(&self) -> &[Entity] {
-        &self.0
+pub struct ItemStorageItems<'a> {
+    items: Query<'a, 'a, (Entity, &'a Parent), (With<Item>, Without<Transform>)>,
+}
+
+impl ItemStorageItems<'_> {
+    #[allow(dead_code)]
+    pub fn get(&self, entity: Entity) -> Vec<Entity> {
+        self.items
+            .iter()
+            .filter(|(_, p)| p.get() == entity)
+            .map(|(e, _)| e)
+            .collect()
     }
 }
 
@@ -24,19 +35,8 @@ pub struct InsertItemCommand {
 
 impl Command for InsertItemCommand {
     fn apply(self, world: &mut World) {
-        debug_assert!(
-            world
-                .entity_mut(self.storage)
-                .get_mut::<ItemStorage>()
-                .is_some_and(|s| !s.0.contains(&self.item))
-        );
+        assert!(world.entity(self.item).contains::<Item>());
 
-        world
-            .entity_mut(self.storage)
-            .get_mut::<ItemStorage>()
-            .unwrap()
-            .0
-            .push(self.item);
         world
             .entity_mut(self.item)
             .remove::<(Transform, GlobalTransform)>()
@@ -51,25 +51,13 @@ pub struct DropItemCommand {
 
 impl Command for DropItemCommand {
     fn apply(self, world: &mut World) {
-        debug_assert!(
+        assert!(world.entity(self.item).contains::<Item>());
+        assert!(
             world
-                .entity_mut(self.item)
+                .entity(self.item)
                 .get::<Parent>()
                 .is_some_and(|p| p.get() == self.storage)
         );
-        debug_assert!(
-            world
-                .entity_mut(self.storage)
-                .get_mut::<ItemStorage>()
-                .is_some_and(|s| s.0.contains(&self.item))
-        );
-
-        world
-            .entity_mut(self.storage)
-            .get_mut::<ItemStorage>()
-            .unwrap()
-            .0
-            .retain(|e| *e != self.item);
 
         let transform = world
             .entity(self.storage)
