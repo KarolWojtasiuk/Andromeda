@@ -13,6 +13,7 @@ derive_more = { version = "1.0.0", features = [
     "from_str",
     "display",
 ] }
+noise = "0.9.0"
 rand = "0.8.5"
 smart-default = "0.7.1"
 

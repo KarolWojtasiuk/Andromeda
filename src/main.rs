@@ -1,5 +1,6 @@
 #![allow(clippy::type_complexity)]
 #![allow(clippy::too_many_arguments)]
+#![feature(iter_array_chunks)]
 
 use bevy::prelude::*;
 
