@@ -43,10 +43,24 @@ fn setup(
         },
         Transform::from_xyz(3.0, 10.0, 3.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
+
+    const SIZE: UVec2 = UVec2::new(1000, 1000);
+    const CELL_SIZE: f32 = 1.5;
     commands.spawn((
-        Transform::from_xyz(0.0, -1.0, 0.0),
-        Mesh3d(meshes.add(generate_world(12534, 100, 100, 4.0, 10.0))),
-        MeshMaterial3d(materials.add(Color::linear_rgb(0.4, 0.1, 0.9))),
+        Transform::from_xyz(
+            -(CELL_SIZE * SIZE.x as f32 / 2.0),
+            -1.0,
+            -(CELL_SIZE * SIZE.y as f32 / 2.0),
+        ),
+        Mesh3d(meshes.add(generate_world(
+            2137,
+            SIZE,
+            CELL_SIZE,
+            2.5,
+            Vec2::new(123.4, 432.1),
+            100.0,
+        ))),
+        MeshMaterial3d(materials.add(Color::linear_rgb(0.3, 0.1, 0.6))),
     ));
 
     let player = character_registry.spawn(GameCharacterId::Player, &mut commands);
@@ -78,24 +92,35 @@ fn setup(
     // }
 }
 
-fn generate_world(seed: u32, width: u16, height: u16, scale: f64, max_elevation: f32) -> Mesh {
-    assert!(width % 2 == 0);
-    assert!(height % 2 == 0);
-    assert!(max_elevation > 0.0);
+fn generate_world(
+    seed: u32,
+    size: UVec2,
+    cell_size: f32,
+    noise_scale: f32,
+    noise_offset: Vec2,
+    height_scale: f32,
+) -> Mesh {
+    assert!(size.x % 2 == 0);
+    assert!(size.y % 2 == 0);
+    assert!(height_scale > 0.0);
 
     let mut vertices = vec![];
     let mut indices = vec![];
 
     let perlin = noise::Perlin::new(seed);
-    let generate_vertex = |x: u16, y: u16| {
+    let generate_vertex = |x: u32, y: u32| {
         [
-            x as f32,
+            x as f32 * cell_size,
             perlin.get([
-                scale * (x as f64 / width as f64),
-                scale * (y as f64 / height as f64),
+                cell_size as f64
+                    * noise_scale as f64
+                    * (noise_offset.x as f64 + x as f64 / size.x as f64),
+                cell_size as f64
+                    * noise_scale as f64
+                    * (noise_offset.y as f64 + y as f64 / size.y as f64),
             ]) as f32
-                * max_elevation,
-            y as f32,
+                * height_scale,
+            y as f32 * cell_size,
         ]
     };
 
@@ -109,17 +134,17 @@ fn generate_world(seed: u32, width: u16, height: u16, scale: f64, max_elevation:
             generate_vertex(x + 1, y),
         ]);
         indices.extend([
-            vertices.len() as u32 - 4, // 0
-            vertices.len() as u32 - 3, // 1
-            vertices.len() as u32 - 1, // 3
-            vertices.len() as u32 - 1, // 3
-            vertices.len() as u32 - 3, // 1
-            vertices.len() as u32 - 2, // 2
+            vertices.len() as u32 - 4,
+            vertices.len() as u32 - 3,
+            vertices.len() as u32 - 1,
+            vertices.len() as u32 - 1,
+            vertices.len() as u32 - 3,
+            vertices.len() as u32 - 2,
         ]);
 
-        if x + 2 < width {
+        if x + 2 < size.x {
             x += 1;
-        } else if y + 2 < height {
+        } else if y + 2 < size.y {
             x = 0;
             y += 1;
         } else {
