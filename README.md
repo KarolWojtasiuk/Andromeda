@@ -12,10 +12,7 @@ Action role-playing game set in a fantasy world.
 
 ### Docs
 1. [Install mdBook](https://rust-lang.github.io/mdBook/guide/installation.html)
-2. Run `mdbook serve` or `mdbook build` in `book` directory
-
-## License
-TODO
+2. Run `mdbook build` or `mdbook serve` in `book` directory
 
 ## Acknowledgements
 - [Bevy Engine](https://bevyengine.org)
