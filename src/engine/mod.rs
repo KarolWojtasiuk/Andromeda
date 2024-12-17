@@ -3,6 +3,7 @@ pub mod character;
 pub mod input;
 pub mod item;
 pub mod prototype;
+pub mod world_generator;
 
 mod debug_console;
 

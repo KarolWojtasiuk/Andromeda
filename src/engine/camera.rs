@@ -16,6 +16,7 @@ impl Plugin for GameCameraPlugin {
 #[derive(Component, SmartDefault, Reflect, Debug)]
 #[require(Transform, Camera3d)]
 pub struct GameCamera {
+    pub offset: Vec3,
     #[default(Dir3::from_xyz(0.0, 2.5, 1.0).unwrap())]
     pub direction: Dir3,
     #[default(20.0)]
@@ -46,7 +47,7 @@ fn update_camera(
     }
 
     camera_transform.translation.smooth_nudge(
-        &(target.translation + camera.direction * camera.distance),
+        &(target.translation + camera.offset + camera.direction * camera.distance),
         camera.smooth_rate,
         time.delta_secs(),
     );
